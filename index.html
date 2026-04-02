@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridSynex - Smart Retrofit Planning</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GridSynex</h1>
+            <p>Smart retrofit planning for homes</p>
+        </div>
+
+        <div class="content">
+            <!-- HOME SCREEN -->
+            <div class="screen active" id="screen-home">
+                <div class="subtitle">Welcome to GridSynex</div>
+                <button class="btn btn-primary" onclick="goToScreen('screen-survey')">Start New Survey</button>
+
+                <h2 style="margin-top: 32px; margin-bottom: 18px; font-size: 20px;">Recent Surveys</h2>
+                <div class="survey-card" onclick="loadSurvey('12 King Street, Bristol'); goToScreen('screen-proposal');">
+                    <h3>12 King Street, Bristol</h3>
+                    <p>Click to view proposal</p>
+                </div>
+                <div class="survey-card" onclick="loadSurvey('84 Meadow Park Road, Leeds'); goToScreen('screen-proposal');">
+                    <h3>84 Meadow Park Road, Leeds</h3>
+                    <p>Click to view proposal</p>
+                </div>
+                <div class="survey-card" onclick="loadSurvey('27 Station Road, Croydon'); goToScreen('screen-proposal');">
+                    <h3>27 Station Road, Croydon</h3>
+                    <p>Click to view proposal</p>
+                </div>
+            </div>
+
+            <!-- SURVEY SCREEN -->
+            <div class="screen" id="screen-survey">
+                <button class="btn btn-back" onclick="goToScreen('screen-home')">← Back</button>
+                <h2>Begin Survey</h2>
+                <p class="explanation-text">
+                    This quick survey will gather key information about your property to generate a comprehensive retrofit proposal. It takes just a few minutes.
+                </p>
+                <button class="btn btn-primary" onclick="goToScreen('screen-details')">Begin Survey</button>
+            </div>
+
+            <!-- DETAILS SCREEN -->
+            <div class="screen" id="screen-details">
+                <button class="btn btn-back" onclick="goToScreen('screen-survey')">← Back</button>
+                <h2>Property Details</h2>
+
+                <div class="input-group">
+                    <label>Name</label>
+                    <input type="text" id="name" placeholder="Full Name" oninput="updateData('name', this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="your@email.com" oninput="updateData('email', this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label>Phone</label>
+                    <input type="tel" id="phone" placeholder="Phone Number" oninput="updateData('phone', this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label>Address</label>
+                    <input type="text" id="address" placeholder="Street Address" oninput="updateData('address', this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label>Postcode</label>
+                    <input type="text" id="postcode" placeholder="Postcode" oninput="updateData('postcode', this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label>Property Type</label>
+                    <select id="propertyType" onchange="updateData('propertyType', this.value)">
+                        <option value="">Select Property Type</option>
+                        <option value="detached">Detached House</option>
+                        <option value="semi-detached">Semi-Detached House</option>
+                        <option value="terraced">Terraced House</option>
+                        <option value="bungalow">Bungalow</option>
+                        <option value="flat">Flat/Apartment</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Bedrooms</label>
+                    <select id="bedrooms" onchange="updateData('bedrooms', this.value)">
+                        <option value="">Select Number of Bedrooms</option>
+                        <option value="1">1 Bedroom</option>
+                        <option value="2">2 Bedrooms</option>
+                        <option value="3">3 Bedrooms</option>
+                        <option value="4">4 Bedrooms</option>
+                        <option value="5">5+ Bedrooms</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Floor Area (m²)</label>
+                    <input type="number" id="floorArea" placeholder="e.g., 120" oninput="updateData('floorArea', this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label>Heating System</label>
+                    <select id="heatingSystem" onchange="updateData('heatingSystem', this.value)">
+                        <option value="">Select Heating System</option>
+                        <option value="gas-boiler">Gas Boiler</option>
+                        <option value="oil-boiler">Oil Boiler</option>
+                        <option value="electric">Electric Heating</option>
+                        <option value="heat-pump">Heat Pump</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>EPC Rating</label>
+                    <select id="epcRating" onchange="updateData('epcRating', this.value)">
+                        <option value="">Select EPC Rating</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="G">G</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goToScreen('screen-survey')">Back</button>
+                    <button class="btn btn-primary" onclick="goToScreen('screen-map')">Continue</button>
+                </div>
+            </div>
+
+            <!-- MAP SCREEN -->
+            <div class="screen" id="screen-map">
+                <button class="btn btn-back" onclick="goToScreen('screen-details')">← Back</button>
+                <h2>Confirm Property</h2>
+
+                <div class="search-container">
+                    <input type="text" id="mapSearch" placeholder="Enter address or postcode" oninput="handleAddressInput(this.value)">
+                    <button class="search-btn" onclick="searchAddress()">Search</button>
+                </div>
+
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+
+                <div class="map-info">
+                    📍 Zoom the map or search for an address to confirm property location
+                </div>
+
+                <div class="property-image-placeholder">🏠 Property Image Preview</div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goToScreen('screen-details')">Back</button>
+                    <button class="btn btn-primary" onclick="goToScreen('screen-upload')">Confirm</button>
+                </div>
+            </div>
+
+            <!-- UPLOAD SCREEN -->
+            <div class="screen" id="screen-upload">
+                <button class="btn btn-back" onclick="goToScreen('screen-map')">← Back</button>
+                <h2>Upload Images</h2>
+                <p style="text-align: left; margin-bottom: 20px;">Upload photos to improve survey accuracy (optional)</p>
+
+                <div class="upload-area">
+                    <h4>🏠 Roof</h4>
+                    <p>Upload roof condition photos</p>
+                    <input type="file" accept="image/*" style="display: none;" id="roof-upload">
+                </div>
+
+                <div class="upload-area">
+                    <h4>📊 Meter</h4>
+                    <p>Upload electricity/gas meter photos</p>
+                    <input type="file" accept="image/*" style="display: none;" id="meter-upload">
+                </div>
+
+                <div class="upload-area">
+                    <h4>🔥 Heating</h4>
+                    <p>Upload boiler/heating system photos</p>
+                    <input type="file" accept="image/*" style="display: none;" id="heating-upload">
+                </div>
+
+                <div class="upload-area">
+                    <h4>🏘️ Exterior</h4>
+                    <p>Upload property exterior photos</p>
+                    <input type="file" accept="image/*" style="display: none;" id="exterior-upload">
+                </div>
+
+                <div class="upload-area">
+                    <h4>📄 Documents</h4>
+                    <p>Upload EPC, bills, or other documents</p>
+                    <input type="file" accept="*" style="display: none;" id="documents-upload">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goToScreen('screen-map')">Back</button>
+                    <button class="btn btn-primary" onclick="goToScreen('screen-assessment')">Continue</button>
+                </div>
+            </div>
+
+            <!-- ASSESSMENT SCREEN -->
+            <div class="screen" id="screen-assessment">
+                <button class="btn btn-back" onclick="goToScreen('screen-upload')">← Back</button>
+                <h2>Retrofit Options</h2>
+                <p style="text-align: left; margin-bottom: 20px;">Select which retrofit measures you'd like to explore:</p>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="solar-pv" onchange="updateData('selectedOptions', getSelectedOptions())">
+                        <label for="solar-pv">Solar PV - Generate renewable electricity</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="battery" onchange="updateData('selectedOptions', getSelectedOptions())">
+                        <label for="battery">Solar PV + Battery - Store energy for later use</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="heat-pump" onchange="updateData('selectedOptions', getSelectedOptions())">
+                        <label for="heat-pump">Air Source Heat Pump - Low carbon heating</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="smart-home" onchange="updateData('selectedOptions', getSelectedOptions())">
+                        <label for="smart-home">Smart Home - Optimize energy usage</label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goToScreen('screen-upload')">Back</button>
+                    <button class="btn btn-primary" onclick="goToScreen('screen-proposal')">Generate Proposal</button>
+                </div>
+            </div>
+
+            <!-- PROPOSAL SCREEN -->
+            <div class="screen" id="screen-proposal">
+                <button class="btn btn-back" onclick="goToScreen('screen-home')">← Back to Home</button>
+                <h2>Retrofit Proposal</h2>
+
+                <div id="proposal-content"></div>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(34, 197, 94, 0.2);">
+                    <h3 style="color: #22c55e; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Project Summary & Assumptions</h3>
+                    <div id="assumptions-content"></div>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="goToScreen('screen-home')">Home</button>
+                    <button class="btn btn-primary" onclick="exportProposal()">📥 Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
