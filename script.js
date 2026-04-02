@@ -105,26 +105,38 @@ function handleAddressInput(value) {
     // Can be used for real-time suggestions
 }
 
-function searchAddress() {
-    const searchInput = document.getElementById('mapSearch').value.trim().toUpperCase();
-    
-    if (!searchInput) return;
+async function searchAddress() {
+    const searchInput = document.getElementById('mapSearch').value.trim();
 
-    // Try to match postcode
-    for (const [postcode, coords] of Object.entries(addressCoordinates)) {
-        if (postcode.includes(searchInput) || searchInput.includes(postcode)) {
-            setMapMarker(coords.lat, coords.lng, coords.name);
+    if (!searchInput || !map) return;
+
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gb&q=${encodeURIComponent(searchInput)}`;
+        const response = await fetch(url, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        const results = await response.json();
+
+        if (!results || results.length === 0) {
+            alert('Location not found');
             return;
         }
-    }
 
-    // Try UK postcode format - basic geocoding simulation
-    // In production, you'd use a real geocoding API
-    if (/^[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}$/i.test(searchInput)) {
-        // Default to UK center for unknown postcodes
-        map.setView([52.5, -2], 10);
+        const place = results[0];
+        const lat = parseFloat(place.lat);
+        const lng = parseFloat(place.lon);
+
+        setMapMarker(lat, lng, place.display_name);
+        map.setView([lat, lng], 16);
+    } catch (error) {
+        console.error('Geocoding error:', error);
+        alert('Unable to search for this location right now');
     }
 }
+
 
 function updateData(field, value) {
     surveyData[field] = value;
