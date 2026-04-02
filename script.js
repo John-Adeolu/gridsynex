@@ -74,12 +74,15 @@ function initMap() {
     if (map) return;
     
     map = L.map('map').setView([52.5, -2], 6);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19,
-        minZoom: 5
-    }).addTo(map);
+
+    const satelliteLayer = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {
+    attribution: 'Tiles © Esri'
+  }
+);
+
+satelliteLayer.addTo(map);
 }
 
 function setMapMarker(lat, lng, name) {
